@@ -2,6 +2,7 @@ const imagesArea = document.querySelector('.images');
 const gallery = document.querySelector('.gallery');
 const galleryHeader = document.querySelector('.gallery-header');
 const search = document.getElementById('search');
+const errorMessage = document.getElementById('error-message')
 
 const searchBtn = document.getElementById('search-btn');
 const sliderBtn = document.getElementById('create-slider');
@@ -27,13 +28,19 @@ const showImages = (images) => {
         div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
         gallery.appendChild(div)
     })
-
 }
 
 const getImages = (query) => {
     fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
         .then(response => response.json())
-        .then(data => showImages(data.hits))
+        .then(data => {
+            if (data.hits.length !== 0) {
+                showImages(data.hits)
+            } else {
+                alert('No image found! Try another Keyword')
+                imagesArea.style.display = 'none'
+            }
+        })
         .catch(err => console.log(err))
 }
 
@@ -119,7 +126,8 @@ searchBtn.addEventListener('click', function () {
     clearInterval(timer);
     const searchValue = search.value
     if (searchValue.length === 0 || searchValue.length < 3) {
-        alert('Please input valid string')
+        alert('Minimum 3 char need for search')
+        imagesArea.style.display = 'none'
     } else {
         getImages(searchValue)
         sliders.length = 0;
